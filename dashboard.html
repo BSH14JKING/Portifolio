@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | WinkTone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #1abc9c;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --sidebar: #2c3e50;
+            --sidebar-hover: #1abc9c;
+            --content-bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-light: #f8f9fa;
+            --text-dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--content-bg);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar);
+            color: var(--text-light);
+            min-height: 100vh;
+            transition: all 0.3s;
+            position: fixed;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header h3 {
+            margin-left: 10px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--sidebar-hover);
+            color: white;
+        }
+
+        .sidebar-menu li .submenu {
+            padding-left: 30px;
+            display: none;
+        }
+
+        .sidebar-menu li .submenu a {
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-menu li.has-submenu > a::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            font-size: 0.8rem;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-menu li.has-submenu.active > a::after {
+            transform: rotate(180deg);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background-color: var(--card-bg);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .top-nav-left h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-profile .name {
+            font-weight: 500;
+        }
+
+        .user-profile .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--card-bg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 180px;
+            display: none;
+            z-index: 100;
+        }
+
+        .user-profile .dropdown a {
+            display: block;
+            padding: 8px 15px;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .user-profile .dropdown a:hover {
+            background-color: var(--light);
+        }
+
+        .user-profile:hover .dropdown {
+            display: block;
+        }
+
+        /* Dashboard Cards */
+        .card-container {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .card-header .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .card-body h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .card-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .card-footer i {
+            margin-right: 5px;
+        }
+
+        .card-footer span {
+            font-size: 0.9rem;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            padding: 25px;
+        }
+
+        .activity-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+        }
+
+        .activity-card h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .activity-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .activity-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .activity-content p {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-left: auto;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .theme-toggle label {
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--secondary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            --content-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-dark: #f8f9fa;
+            --text-light: #f8f9fa;
+            --sidebar: #0f3460;
+            --sidebar-hover: #1abc9c;
+            --light: #2a2a3c;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .top-nav-left .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-shield-alt"></i>
+            <h3>WinkTone Admin</h3>
+        </div>
+        <div class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i class="fas fa-lock"></i>
+                        <span>Security</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="security.html">Security Settings</a></li>
+                        <li><a href="users.html">User Management</a></li>
+                        <li><a href="#">Access Control</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="notifications.html">Notification Settings</a></li>
+                        <li><a href="#">Email Templates</a></li>
+                        <li><a href="#">Push Notifications</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="logs.html">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Activity Logs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="top-nav-left">
+                <h2>Dashboard</h2>
+            </div>
+            <div class="top-nav-right">
+                <div class="theme-toggle">
+                    <i class="fas fa-sun"></i>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-profile">
+                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Admin">
+                    <div class="name">Admin</div>
+                    <div class="dropdown">
+                        <a href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="card-container">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Security Alerts</h3>
+                    <div class="icon" style="background-color: rgba(220, 53, 69, 0.1); color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h2>12</h2>
+                    <p>New security alerts this week</p>
+                </div>
+                <div class="card-footer">
+                    <i class="fas fa-arrow-up" style="color: var(--danger);"></i>
+                    <span style="color: var(--danger);">5% increase</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Users Online</h3>
+                    <div class="icon" style="background-color: rgba(40, 167, 69, 0.1); color: var(--success);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h2>24</h2>
+                    <p>Currently active users</p>
+                </div>
+                <div class="card-footer">
+                    <i class="fas fa-arrow-up" style="color: var(--success);"></i>
+                    <span style="color: var(--success);">12% increase</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Notifications Sent</h3>
+                    <div class="icon" style="background-color: rgba(23, 162, 184, 0.1); color: var(--info);">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h2>156</h2>
+                    <p>Notifications this month</p>
+                </div>
+                <div class="card-footer">
+                    <i class="fas fa-arrow-up" style="color: var(--info);"></i>
+                    <span style="color: var(--info);">8% increase</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <div class="activity-card">
+                <h3>Recent Security Activity</h3>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background-color: rgba(220, 53, 69, 0.1); color: var(--danger);">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Failed Login Attempt</h4>
+                        <p>IP: 192.168.1.45 tried to access admin panel</p>
+                    </div>
+                    <div class="activity-time">10 min ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background-color: rgba(40, 167, 69, 0.1); color: var(--success);">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>User Role Updated</h4>
+                        <p>User "johndoe" was granted admin privileges</p>
+                    </div>
+                    <div class="activity-time">1 hour ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background-color: rgba(255, 193, 7, 0.1); color: var(--warning);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Security Warning</h4>
+                        <p>Unusual activity detected from IP: 103.45.67.89</p>
+                    </div>
+                    <div class="activity-time">3 hours ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background-color: rgba(23, 162, 184, 0.1); color: var(--info);">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Notification Sent</h4>
+                        <p>Password reset email sent to user@example.com</p>
+                    </div>
+                    <div class="activity-time">5 hours ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Toggle submenu
+        const hasSubmenu = document.querySelectorAll('.has-submenu > a');
+        hasSubmenu.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('active');
+                const submenu = parent.querySelector('.submenu');
+                if (submenu.style.display === 'block') {
+                    submenu.style.display = 'none';
+                } else {
+                    submenu.style.display = 'block';
+                }
+            });
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+    </script>
+</body>
+</html>
